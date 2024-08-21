@@ -18,7 +18,6 @@
     "Unchanged": "Inchangé",
     "Changed": "Changé",
     "No Category": "Non Catégorisé",
-    "Not Defined": "Non Défini",
     "Unproven": "Non Prouvé",
     "Proof-of-Concept": "Preuve de concept",
     "Functional": "Fonctionnel",
@@ -29,7 +28,5 @@
     "Unavailable":"Indisponible",
     "Unknown":"Inconnu",
     "Reasonable":"Raisonable",
-    "Confirmed":"Confirmé",
-    "":"",
-    "":""
+    "Confirmed":"Confirmé"
 }

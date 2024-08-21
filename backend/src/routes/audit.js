@@ -576,4 +576,109 @@ module.exports = function(app, io) {
         })
         .catch(err => Response.Internal(res, err))
     });
+
+    // New api for summary page
+    // Get the count of vulns
+    app.get("/api/audits/:auditId/findingVulnCount", acl.hasPermission('audits:read'), async function(req, res) {
+        // #swagger.tags = ['Audit']
+
+        Audit.getAudit(acl.isAllowed(req.decodedToken.role, 'audits:read-all'), req.params.auditId, req.decodedToken.id).then(
+            msg => {
+                let findings = msg.findings;
+                let critical = 0
+                let high = 0
+                let medium = 0
+                let low = 0
+                for (let i of findings) {
+                    for (let j of i.customFields) {
+                        if (j.customField.label == "severity") {
+                            switch (j.text) {
+                                case "嚴重":
+                                    critical += 1;
+                                    break;
+                                case "高":
+                                    high += 1;
+                                    break;
+                                case "中":
+                                    medium += 1;
+                                    break;
+                                case "低":
+                                    low += 1;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                }
+                let count = {critical, high, medium, low}
+                Response.Ok(res, count)
+            }
+        ).catch(
+            err => Response.Internal(res, err)
+        );
+        // findingVulnCountquery = await Audit.findById(req.params.auditId)
+        // Audit.getFinding(acl.isAllowed(req.decodedToken.role, 'audits:read'), req.params.auditId, req.decodedToken.id, req.params.findingId)
+        // .then(msg => Response.Ok(res, msg))
+        // .catch(err => Response.Internal(res, err))
+    });
+
+    // Update vuln chart
+    app.post("/api/audits/:auditId/vuln_chart", acl.hasPermission('audits:update'), async function(req, res) {
+        // #swagger.tags = ['Audit']
+
+        var settings = await Settings.getAll();
+        var audit = await Audit.getAudit(acl.isAllowed(req.decodedToken.role, 'audits:read-all'), req.params.auditId, req.decodedToken.id);
+        if (settings.reviews.enabled && audit.state !== "EDIT") {
+            Response.Forbidden(res, "The audit is not in the EDIT state and therefore cannot be edited.");
+            return;
+        }
+        // if (!req.body.title) {
+        //     Response.BadParameters(res, 'Missing some required parameters: title');
+        //     return;
+        // }
+
+        if (!req.body.chart) {
+            Response.BadParameters(res, 'Missing some required parameters: chart');
+            return;
+        }
+        let chart = req.body.chart;
+
+        Audit.updateVulnChart(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, chart)
+        .then(msg => {
+            Response.Ok(res, msg)
+        })
+        .catch(err => Response.Internal(res, err))
+
+
+        // var finding = {};
+        // Required parameters
+        // finding.title = req.body.title;
+        
+        // // Optional parameters
+        // if (req.body.vulnType) finding.vulnType = req.body.vulnType;
+        // if (req.body.description) finding.description = req.body.description;
+        // if (req.body.observation) finding.observation = req.body.observation;
+        // if (req.body.remediation) finding.remediation = req.body.remediation;
+        // if (req.body.remediationComplexity) finding.remediationComplexity = req.body.remediationComplexity;
+        // if (req.body.priority) finding.priority = req.body.priority;
+        // if (req.body.references) finding.references = req.body.references;
+        // if (req.body.cvssv3) finding.cvssv3 = req.body.cvssv3;
+        // if (req.body.poc) finding.poc = req.body.poc;
+        // if (req.body.scope) finding.scope = req.body.scope;
+        // if (req.body.status !== undefined) finding.status = req.body.status;
+        // if (req.body.category) finding.category = req.body.category
+        // if (req.body.customFields) finding.customFields = req.body.customFields
+
+        // if (settings.reviews.enabled && settings.reviews.private.removeApprovalsUponUpdate) {
+        //     Audit.updateGeneral(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, { approvals: [] });
+        // }
+
+        // Audit.createFinding(acl.isAllowed(req.decodedToken.role, 'audits:update-all'), req.params.auditId, req.decodedToken.id, finding)
+        // .then(msg => {
+        //     io.to(req.params.auditId).emit('updateAudit');
+        //     Response.Ok(res, msg)
+        // })
+        // .catch(err => Response.Internal(res, err))
+    });
 }

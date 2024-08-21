@@ -83,5 +83,15 @@ export default {
 
   updateReadyForReview: function(auditId, data) {
     return Vue.prototype.$axios.put(`audits/${auditId}/updateReadyForReview`, data);
+  },
+
+  // New functions
+  // Get vuln count
+  findingsVulnCount: function(auditId) {
+    return Vue.prototype.$axios.get(`audits/${auditId}/findingVulnCount`);
+  },
+
+  updateVulnChart: function(auditId, chart) {
+    return Vue.prototype.$axios.post(`audits/${auditId}/vuln_chart`, {chart});
   }
 }
