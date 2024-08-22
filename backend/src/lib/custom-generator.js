@@ -314,4 +314,30 @@ expressions.filters.severity_counter = function (input, s) {
 	return result;
 };
 
+expressions.filters.convertDateZH = function (input, s) {
+	var date = new Date(input);
+	if (date !== "Invalid Date") {
+		var day = date.getUTCDate();
+		var month = date.getUTCMonth();
+		var year = date.getUTCFullYear();
+		if (s === "OnlyYear") {
+			return year;
+		} else if (s === "short") {
+			return (
+				year +
+				"-" +
+				(month < 10 ? "0" + month : month) +
+				"-" +
+				(day < 10 ? "0" + day : day)
+			);
+		} else {
+			return (
+				year + "年" + month + "月" + (day < 10 ? "0" + day : day) + "日"
+			);
+		}
+	} else {
+		return "Invalid Date";
+	}
+};
+
 exports.expressions = expressions;
