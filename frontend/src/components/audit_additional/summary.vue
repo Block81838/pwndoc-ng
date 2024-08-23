@@ -126,19 +126,19 @@ export default {
 					this.chart_option.series[0].data = [
 						{
 							value: count_res["critical"],
-							itemStyle: { color: "#FF0000" },
+							itemStyle: { color: "#C00000" },
 						},
 						{
 							value: count_res["high"],
-							itemStyle: { color: "#FFA500" },
+							itemStyle: { color: "#FF0000" },
 						},
 						{
 							value: count_res["medium"],
-							itemStyle: { color: "#FFFF00" },
+							itemStyle: { color: "#FFBF00" },
 						},
 						{
 							value: count_res["low"],
-							itemStyle: { color: "#008000" },
+							itemStyle: { color: "#00b050" },
 						},
 					];
 					this.initChart();
